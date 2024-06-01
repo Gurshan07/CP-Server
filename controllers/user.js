@@ -43,11 +43,15 @@ const newUser = TryCatch(async (req, res, next) => {
 const login = TryCatch(async (req, res, next) => {
   const { username, password } = req.body;
 
-  const user = await User.findOne({ username }).select("+password");
+  // Trim white spaces from username and password
+  const trimmedUsername = username.trim();
+  const trimmedPassword = password.trim();
+
+  const user = await User.findOne({ username: trimmedUsername }).select("+password");
 
   if (!user) return next(new ErrorHandler("Invalid Username or Password", 404));
 
-  const isMatch = await compare(password, user.password);
+  const isMatch = await compare(trimmedPassword, user.password);
 
   if (!isMatch)
     return next(new ErrorHandler("Invalid Username or Password", 404));
